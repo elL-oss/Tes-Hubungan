@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klinik Asmara — Cek Penyakit Hubunganmu!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF6ED;
+    --coral:#FF6F91;
+    --coral-dark:#E85577;
+    --sky:#8FD3FF;
+    --sky-dark:#5FB8F0;
+    --mustard:#FFC94D;
+    --plum:#3A2E39;
+    --plum-soft:#6E5D6C;
+    --card:#FFFFFF;
+    --line:rgba(58,46,57,0.10);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    color:var(--plum);
+    background:var(--cream);
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  h1,h2,h3,.display{
+    font-family:'Baloo 2', cursive;
+    line-height:1.15;
+    margin:0;
+  }
+
+  /* organic blob background */
+  .blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(2px);
+    opacity:0.55;
+    z-index:0;
+  }
+  .blob-1{width:340px;height:340px;background:var(--sky);top:-120px;left:-100px;}
+  .blob-2{width:280px;height:280px;background:var(--mustard);bottom:-100px;right:-80px;opacity:0.45;}
+  .blob-3{width:180px;height:180px;background:var(--coral);top:45%;right:-90px;opacity:0.30;}
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+  }
+
+  .card{
+    width:100%;
+    max-width:560px;
+    background:var(--card);
+    border-radius:28px;
+    padding:44px 36px;
+    box-shadow:0 20px 60px rgba(58,46,57,0.12);
+    border:2px solid var(--line);
+  }
+
+  /* ---------- HOME SCREEN ---------- */
+  .screen{display:none;}
+  .screen.active{display:block; animation:riseIn .5s ease both;}
+
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .stetoskop{font-size:54px; display:block; margin-bottom:14px;}
+
+  #home h1{
+    font-size:clamp(28px,6vw,38px);
+    color:var(--coral-dark);
+  }
+
+  #home .sub{
+    margin-top:14px;
+    font-size:16px;
+    color:var(--plum-soft);
+    max-width:42ch;
+    line-height:1.6;
+  }
+
+  .tag-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:22px;
+  }
+  .tag{
+    background:var(--cream);
+    border:1.5px solid var(--line);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--plum-soft);
+  }
+
+  .btn{
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    font-size:18px;
+    border:none;
+    border-radius:16px;
+    padding:16px 28px;
+    cursor:pointer;
+    color:#fff;
+    background:var(--coral);
+    box-shadow:0 8px 0 var(--coral-dark);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{
+    transform:translateY(6px);
+    box-shadow:0 2px 0 var(--coral-dark);
+  }
+  .btn:hover{transform:translateY(-2px);}
+
+  #home .btn{margin-top:30px; width:100%;}
+
+  /* ---------- QUIZ SCREEN ---------- */
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:26px;
+  }
+  .dot{
+    height:8px;
+    flex:1;
+    border-radius:999px;
+    background:var(--line);
+    transition:background .3s ease;
+  }
+  .dot.done{background:var(--coral);}
+  .dot.now{background:var(--mustard);}
+
+  .qcount{
+    font-size:13px;
+    font-weight:600;
+    color:var(--plum-soft);
+    margin-bottom:8px;
+  }
+
+  #quiz h2{
+    font-size:clamp(20px,4.5vw,25px);
+    color:var(--plum);
+    margin-bottom:24px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .option{
+    text-align:left;
+    background:var(--cream);
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:15px 18px;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--plum);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .option:hover{
+    border-color:var(--sky-dark);
+    background:#F1FAFF;
+    transform:translateX(3px);
+  }
+  .option:active{transform:scale(0.98);}
+
+  /* ---------- RESULT SCREEN ---------- */
+  #result .badge{
+    display:inline-block;
+    background:var(--mustard);
+    color:var(--plum);
+    font-weight:700;
+    font-size:13px;
+    padding:6px 16px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+
+  #result h2{
+    font-size:clamp(26px,6vw,34px);
+    color:var(--coral-dark);
+    margin-bottom:6px;
+  }
+
+  #result .emoji-big{font-size:60px; display:block; margin-bottom:10px;}
+
+  #result .desc{
+    margin-top:16px;
+    font-size:15.5px;
+    line-height:1.7;
+    color:var(--plum-soft);
+  }
+
+  .resep{
+    margin-top:24px;
+    background:var(--cream);
+    border:2px dashed var(--sky-dark);
+    border-radius:18px;
+    padding:20px;
+  }
+  .resep h3{
+    font-size:16px;
+    color:var(--sky-dark);
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .resep p{
+    margin:0;
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--plum);
+  }
+
+  .result-actions{
+    margin-top:28px;
+    display:flex;
+    gap:12px;
+  }
+  .btn-secondary{
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    font-size:15px;
+    border:2px solid var(--line);
+    background:transparent;
+    color:var(--plum);
+    border-radius:14px;
+    padding:13px 20px;
+    cursor:pointer;
+    flex:1;
+  }
+  .btn-secondary:hover{border-color:var(--coral);}
+
+  #result .btn{flex:1.4;}
+
+  @media (max-width:480px){
+    .card{padding:32px 22px; border-radius:22px;}
+    .result-actions{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="wrap">
+  <div class="card">
+
+    <!-- HOME -->
+    <section id="home" class="screen active">
+      <span class="stetoskop">🩺💘</span>
+      <h1>Klinik Asmara: Cek Penyakit Hubunganmu!</h1>
+      <p class="sub">Sebelum overthinking makin parah, mending periksa dulu. Jawab jujur ya, jangan diva — 6 pertanyaan doang kok.</p>
+      <div class="tag-row">
+        <span class="tag">⏱️ 2 menit</span>
+        <span class="tag">🙈 Anonim</span>
+        <span class="tag">🎯 4 diagnosis</span>
+      </div>
+      <button class="btn" onclick="startQuiz()">Mulai Tes →</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="screen">
+      <div class="qcount" id="qcount">Pertanyaan 1/6</div>
+      <div class="progress-row" id="progressRow"></div>
+      <h2 id="questionText"></h2>
+      <div class="options" id="optionsWrap"></div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="result" class="screen">
+      <span class="badge">HASIL DIAGNOSIS</span>
+      <span class="emoji-big" id="resultEmoji"></span>
+      <h2 id="resultTitle"></h2>
+      <p class="desc" id="resultDesc"></p>
+      <div class="resep">
+        <h3>💊 Resep Penawar</h3>
+        <p id="resultTips"></p>
+      </div>
+      <div class="result-actions">
+        <button class="btn-secondary" onclick="restartQuiz()">Ulangi Tes</button>
+        <button class="btn" onclick="shareResult()">Share Hasil 📸</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATA PERTANYAAN
+   Setiap opsi punya properti "type" yang menunjuk ke salah
+   satu dari 4 kategori hasil: bucin, hts, friendzone, toxic
+========================================================= */
+const questions = [
+  {
+    q: "Kalau chat kamu ke doi dibales gimana biasanya?",
+    options: [
+      { text: "Fast response, tapi cuma pas dia butuh sesuatu 🙃", type: "toxic" },
+      { text: "Lama banget, dan aku selalu yang mikir 'kenapa ya'", type: "hts" },
+      { text: "Dibales tapi flat, kayak chat sama admin CS", type: "friendzone" },
+      { text: "Aku yang duluan chat terus, walau dia lagi sibuk", type: "bucin" }
+    ]
+  },
+  {
+    q: "Pas dia nggak bales chat 3 jam, kamu biasanya...",
+    options: [
+      { text: "Buka-tutup chat, cek last seen tiap 5 menit", type: "bucin" },
+      { text: "Auto mikir macem-macem, nyusun skenario putus", type: "hts" },
+      { text: "Santai aja, toh emang bukan siapa-siapa juga", type: "friendzone" },
+      { text: "Udah biasa, dia emang gitu tiap ada masalah kemarin", type: "toxic" }
+    ]
+  },
+  {
+    q: "Reaksi kamu kalau doi nge-like story orang lain?",
+    options: [
+      { text: "Stalk sampe ke followers-nya followers", type: "bucin" },
+      { text: "Diem tapi baper, gak berani nanya soalnya 'kan bukan pacar'", type: "hts" },
+      { text: "Biasa aja, kan emang aku cuma temen curhatnya", type: "friendzone" },
+      { text: "Marah, terus berujung ribut kayak biasa", type: "toxic" }
+    ]
+  },
+  {
+    q: "Weekend kamu biasanya diisi dengan...",
+    options: [
+      { text: "Nungguin dia ada waktu, rencana sendiri auto batal", type: "bucin" },
+      { text: "Standby kalau-kalau dia ngajak 'main bareng'", type: "hts" },
+      { text: "Dengerin curhatnya soal gebetan lain", type: "friendzone" },
+      { text: "Baikan-berantem, drama tiap minggu ganti episode", type: "toxic" }
+    ]
+  },
+  {
+    q: "Kalau ditanya temen, 'kalian ini pacaran apa engga?'",
+    options: [
+      { text: "'Ya... gitu deh, susah dijelasin' 😅", type: "hts" },
+      { text: "'Cuma temen deket kok' padahal chat tiap hari", type: "friendzone" },
+      { text: "'Pacaran lah, walau dia jarang bales aku duluan'", type: "bucin" },
+      { text: "'Iya, tapi ya gitu... sering berantem sih'", type: "toxic" }
+    ]
+  },
+  {
+    q: "Bayangan kamu soal hubungan ini 6 bulan lagi?",
+    options: [
+      { text: "Pengen banget serius, tapi dia gak pernah bahas", type: "hts" },
+      { text: "Berharap dia mulai lihat aku 'lebih dari teman'", type: "friendzone" },
+      { text: "Aku ngikut dia aja, yang penting dia seneng", type: "bucin" },
+      { text: "Entahlah, capek tapi susah move on juga", type: "toxic" }
+    ]
+  }
+];
+
+/* =========================================================
+   DATA HASIL / DIAGNOSIS
+========================================================= */
+const results = {
+  bucin: {
+    emoji: "🥹",
+    title: "Bucin Stadium Akhir",
+    desc: "Kamu ini tim 'dia dulu, baru aku'. Prioritas hidupmu udah kegeser total demi dia — rencana sendiri auto batal kalau dia ngajak, dan validasi harianmu datang dari centang biru doi. Hati-hati, cinta itu penting tapi kamu juga penting.",
+    tips: "Coba metode 'me-time wajib': minimal 2 jam sehari buat hal yang 100% soal kamu, tanpa cek HP dia. Latihan bilang 'nggak bisa' sekali seminggu — dunia nggak runtuh kok, janji."
+  },
+  hts: {
+    emoji: "😶‍🌫️",
+    title: "Pasien HTS (Hubungan Tanpa Status)",
+    desc: "Deket tapi ngambang. Chat tiap hari, curhat semua hal, tapi giliran ditanya 'kita ini apa?' jawabannya muter-muter kayak jalan tol lingkar. Kamu capek nebak-nebak tapi takut kehilangan kenyamanan yang ada.",
+    tips: "Kasih deadline ke diri sendiri: satu obrolan jujur dalam 2 minggu ke depan soal 'kita ini mau ke mana'. Jawaban apapun yang keluar, itu lebih sehat daripada nunggu tanpa kepastian selamanya."
+  },
+  friendzone: {
+    emoji: "🫂",
+    title: "Duta Friendzone",
+    desc: "Kamu jadi tempat curhat nomor satu, pendengar setia drama percintaannya... dengan orang lain. Perhatian kamu dianggap 'baik banget deh lo temen macam apa', bukan sinyal cinta. Sakitnya di hati, tapi jabatannya cuma 'sahabat'.",
+    tips: "Pause dulu jadi tempat curhat 24/7-nya. Kasih jarak yang sehat, alihkan energi ke circle atau gebetan baru yang notice kamu apa adanya — bukan cuma butuh telinga kamu."
+  },
+  toxic: {
+    emoji: "🚩",
+    title: "Toxic Survivor",
+    desc: "Hubunganmu kayak roller coaster: baikan mesra, besoknya ribut gede. Red flag udah numpuk jadi red carpet, tapi kamu masih bertahan karena 'kan pas baikan dia manis banget'. Capek fisik iya, capek hati apalagi.",
+    tips: "Mulai catat pola: tiap abis ribut, tulis apa penyebabnya. Kalau polanya berulang & bikin kamu takut/nggak nyaman, itu sinyal buat ngobrol serius atau minta bantuan orang yang kamu percaya — kamu nggak wajib bertahan di 'zona nyaman yang nyakitin'."
+  }
+};
+
+/* =========================================================
+   STATE & LOGIKA SKOR
+   scoreTally menyimpan hitungan tiap kategori.
+   Tiap kali user pilih opsi, kategori opsi itu +1.
+   Di akhir kuis, kategori dengan angka tertinggi = hasil.
+========================================================= */
+let currentQuestion = 0;
+let scoreTally = { bucin: 0, hts: 0, friendzone: 0, toxic: 0 };
+
+function startQuiz(){
+  currentQuestion = 0;
+  scoreTally = { bucin: 0, hts: 0, friendzone: 0, toxic: 0 };
+  showScreen('quiz');
+  renderProgress();
+  renderQuestion();
+}
+
+function renderProgress(){
+  const row = document.getElementById('progressRow');
+  row.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    if(i < currentQuestion) d.classList.add('done');
+    if(i === currentQuestion) d.classList.add('now');
+    row.appendChild(d);
+  });
+}
+
+function renderQuestion(){
+  const q = questions[currentQuestion];
+  document.getElementById('qcount').textContent = `Pertanyaan ${currentQuestion + 1}/${questions.length}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt.text;
+    btn.onclick = () => selectAnswer(opt.type);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectAnswer(type){
+  // tambah tally skor untuk kategori yang dipilih
+  scoreTally[type] += 1;
+  currentQuestion++;
+
+  if(currentQuestion < questions.length){
+    renderProgress();
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult(){
+  // cari kategori dengan skor tertinggi
+  let topType = 'bucin';
+  let topScore = -1;
+  for(const type in scoreTally){
+    if(scoreTally[type] > topScore){
+      topScore = scoreTally[type];
+      topType = type;
+    }
+  }
+
+  const r = results[topType];
+  document.getElementById('resultEmoji').textContent = r.emoji;
+  document.getElementById('resultTitle').textContent = r.title;
+  document.getElementById('resultDesc').textContent = r.desc;
+  document.getElementById('resultTips').textContent = r.tips;
+
+  showScreen('result');
+}
+
+function restartQuiz(){
+  startQuiz();
+}
+
+function shareResult(){
+  const title = document.getElementById('resultTitle').textContent;
+  const text = `Hasil tes Klinik Asmara-ku: "${title}" 💘 Cek kondisi hubunganmu juga yuk!`;
+  if(navigator.share){
+    navigator.share({ title: 'Klinik Asmara', text }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>{
+      alert('Hasil disalin ke clipboard! Tinggal paste ke story kamu 📋');
+    });
+  }
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+
+</body>
+</html>
